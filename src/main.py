@@ -20,7 +20,7 @@ async def search(
     Parameters
     ----------
     query : str
-        _description_, by default Query( ..., description="Query to search the web", )
+        Query to search the web.
 
     Returns
     -------
@@ -28,3 +28,9 @@ async def search(
         Results from searching the web.
     """
     return {"query": query}
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(app)
