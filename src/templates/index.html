@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+  <head>
+    <!--- basic page needs
+    ================================================== -->
+    <meta charset="utf-8" />
+    <title>ATLAS</title>
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+
+    <!-- mobile specific metas
+    ================================================== -->
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- CSS
+    ================================================== -->
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', path='/css/base.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', path='/css/vendor.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', path='/css/main.css') }}"
+    />
+
+    <!-- script
+    ================================================== -->
+    <script src="{{ url_for('static', path='/js/modernizr.js') }}"></script>
+    <script src="{{ url_for('static', path='/js/pace.min.js') }}"></script>
+
+    <!-- favicons
+    ================================================== -->
+    <link
+      rel="shortcut icon"
+      href="{{ url_for('static', path='/favicon.ico') }}"
+      type="image/x-icon"
+    />
+    <link
+      rel="icon"
+      href="{{ url_for('static', path='/favicon.ico') }}"
+      type="image/x-icon"
+    />
+  </head>
+
+  <body>
+    <!-- home
+    ================================================== -->
+    <main class="s-home s-home--particles">
+      <div id="particles-js" class="home-particles"></div>
+
+      <div class="gradient-overlay"></div>
+
+      <div class="home-content">
+        <div class="home-logo">
+          <a href="#">
+            <img
+              src="{{ url_for('static', path='/images/logo.svg') }}"
+              alt="Homepage"
+            />
+          </a>
+        </div>
+
+        <div class="row home-content__main">
+          <div class="col-eight home-content__text pull-right">
+            <h3>Welcome to ATLAS</h3>
+
+            <h1>
+              This project is currently under
+              <br />
+              development.
+            </h1>
+
+            <p>
+              ATLAS is a suite of software tools to detect and mitigate
+              hallucinations in
+              <strong>AI or Large Language Models (LLMs)</strong>
+              .
+            </p>
+
+            <div class="home-content__subscribe">
+              <form id="mc-form" class="group" novalidate="true">
+                <input
+                  type="email"
+                  value=""
+                  name="EMAIL"
+                  class="email"
+                  id="mc-email"
+                  placeholder="Email Address"
+                  required=""
+                />
+                <input type="submit" name="subscribe" value="Notify Me" />
+                <label for="mc-email" class="subscribe-message"></label>
+              </form>
+            </div>
+          </div>
+          <!-- end home-content__text -->
+
+          <div class="col-four home-content__counter">
+            <h3>Launching soon</h3>
+
+            <div class="home-content__clock">
+              <div class="top">
+                <div class="time days">
+                  325
+                  <span>Days</span>
+                </div>
+              </div>
+              <div class="time hours">
+                09
+                <span>H</span>
+              </div>
+              <div class="time minutes">
+                54
+                <span>M</span>
+              </div>
+              <div class="time seconds">
+                30
+                <span>S</span>
+              </div>
+            </div>
+            <!-- end home-content__clock -->
+          </div>
+          <!-- end home-content__counter -->
+        </div>
+        <!-- end home-content__main -->
+
+        <ul class="home-social">
+          <li>
+            <a href="#0">
+              <i class="fab fa-facebook-f" aria-hidden="true"></i>
+              <span>Facebook</span>
+            </a>
+          </li>
+          <li>
+            <a href="#0">
+              <i class="fab fa-twitter" aria-hidden="true"></i>
+              <span>Twiiter</span>
+            </a>
+          </li>
+          <li>
+            <a href="#0">
+              <i class="fab fa-instagram" aria-hidden="true"></i>
+              <span>Instagram</span>
+            </a>
+          </li>
+          <li>
+            <a href="#0">
+              <i class="fab fa-behance" aria-hidden="true"></i>
+              <span>Behance</span>
+            </a>
+          </li>
+          <li>
+            <a href="#0">
+              <i class="fab fa-dribbble" aria-hidden="true"></i>
+              <span>Dribbble</span>
+            </a>
+          </li>
+        </ul>
+        <!-- end home-social -->
+
+        <div class="row home-copyright">
+          <span><strong>Jesse Amarquaye</strong></span>
+          <span>
+            Design by
+            <a href="https://www.styleshout.com/">styleshout</a>
+          </span>
+        </div>
+        <!-- end home-copyright -->
+
+        <div class="home-content__line"></div>
+      </div>
+      <!-- end home-content -->
+    </main>
+    <!-- end s-home -->
+
+    <!-- info
+    ================================================== -->
+    <a class="info-toggle" href="#0">
+      <span class="info-menu-icon"></span>
+    </a>
+
+    <div class="s-info">
+      <div class="row info-wrapper">
+        <div class="col-seven tab-full info-main">
+          <h1>What are AI hallucinations ?</h1>
+          <p>
+            AI hallucinations are incorrect or misleading results that AI models
+            generate. These errors can be caused by a variety of factors,
+            including insufficient training data, incorrect assumptions made by
+            the model, or biases in the data used to train the model. AI
+            hallucinations can be a problem for AI systems that are used to make
+            important decisions, such as medical diagnoses or financial trading.
+          </p>
+
+          <h1>How do AI hallucinations occur?</h1>
+          <p>
+            AI models are trained on data, and they learn to make predictions by
+            finding patterns in the data. However, if the training data is
+            incomplete or biased, the AI model may learn incorrect patterns.
+            This can lead to the AI model making incorrect predictions, or
+            hallucinating. For example, an AI model that is trained on a dataset
+            of medical images may learn to identify cancer cells. However, if
+            the dataset does not include any images of healthy tissue, the AI
+            model may incorrectly predict that healthy tissue is cancerous. This
+            is an example of an AI hallucination.
+          </p>
+
+          <h1>Our methodology</h1>
+          <p>
+            ATLAS utilizes search to find results to queries and compare them
+            with the response the LLM provides to detect any form of
+            hallucination.
+          </p>
+        </div>
+
+        <div class="col-four tab-full pull-right info-contact">
+          <div class="info-block">
+            <h3>Start A Conversation</h3>
+            <p>
+              Contact us via
+              <a href="mailto:engineeramarquaye@gmail.com" class="info-email">
+                mail
+              </a>
+              <br />
+              <a href="tel:+233550693639" class="'info-phone">Or call us</a>
+            </p>
+          </div>
+
+          <!-- <div class="info-block">
+            <h3>Visit Our Office</h3>
+
+            <p class="info-address">
+              1600 Amphitheatre Parkway<br />
+              Mountain View, CA<br />
+              94043 US
+            </p>
+          </div>
+
+          <div class="info-block">
+            <h3>Find Us On</h3>
+
+            <ul class="info-social">
+              <li>
+                <a href="#0"
+                  ><i class="fab fa-facebook" aria-hidden="true"></i>
+                  <span>Facebook</span></a
+                >
+              </li>
+              <li>
+                <a href="#0"
+                  ><i class="fab fa-twitter" aria-hidden="true"></i>
+                  <span>Twiiter</span></a
+                >
+              </li>
+              <li>
+                <a href="#0"
+                  ><i class="fab fa-instagram" aria-hidden="true"></i>
+                  <span>Instagram</span></a
+                >
+              </li>
+              <li>
+                <a href="#0"
+                  ><i class="fab fa-behance" aria-hidden="true"></i>
+                  <span>Behance</span></a
+                >
+              </li>
+              <li>
+                <a href="#0"
+                  ><i class="fab fa-dribbble" aria-hidden="true"></i>
+                  <span>Dribbble</span></a
+                >
+              </li>
+            </ul>
+          </div> -->
+        </div>
+        <!-- end info contact -->
+      </div>
+      <!-- end info wrapper -->
+    </div>
+    <!-- end s-info -->
+
+    <!-- preloader
+    ================================================== -->
+    <div id="preloader">
+      <div id="loader">
+        <div class="line-scale-pulse-out">
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Java Script
+    ================================================== -->
+    <script src="{{ url_for('static', path='/js/jquery-3.2.1.min.js') }}"></script>
+    <script src="{{ url_for('static', path='/js/plugins.js') }}"></script>
+    <script src="{{ url_for('static', path='/js/polygons.js') }}"></script>
+    <script src="{{ url_for('static', path='/js/main.js') }}"></script>
+  </body>
+</html>
