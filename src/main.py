@@ -1,7 +1,9 @@
 from decouple import config
 
 from fastapi import FastAPI, Query, Request
-from fastapi.responses import PlainTextResponse
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 
 import requests
 
@@ -14,8 +16,12 @@ app = FastAPI(
     title="Atlas",
     summary="Hallucination-detecting API.",
     description="Search the web for queries and compare results with LLM to detect and mitigate hallucinations.\nDeveloped by Jesse Amarquaye.",
-    version="0.0.1",
+    version="0.1.0",
 )
+
+app.mount("/static", StaticFiles(directory="src/static"), name="static")
+
+templates = Jinja2Templates(directory="src/templates")
 
 
 limiter = Limiter(key_func=get_remote_address)
@@ -23,12 +29,13 @@ app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 
-@app.get("/", response_class=PlainTextResponse)
-async def home(request: Request) -> PlainTextResponse:
-    return PlainTextResponse("Page is currently under development...")
+@app.get("/", response_class=HTMLResponse, include_in_schema=False)
+def home(request: Request) -> HTMLResponse:
+    context = {"request": request}
+    return templates.TemplateResponse("index.html", context)
 
 
-@app.get("/api")
+@app.get("/api", tags=["Test endpoints"])
 @limiter.limit("3/minute")
 async def search(
     request: Request,
@@ -55,8 +62,18 @@ async def search(
         "cx": config("GOOGLE_SEARCH_ENGINE_ID"),
     }
 
-    response = requests.get(url, params=params).json()
-    return {"query": query, "response": response["items"]}
+    response = requests.get(url, params=params).json()["items"]
+
+    # Extracting the relevant information into a dictionary
+    results = {}
+    for index, item in enumerate(response):
+        results[index] = {
+            "title": item.get("title"),
+            "snippet": item.get("snippet"),
+            "link": item.get("link"),
+        }
+
+    return results
 
 
 if __name__ == "__main__":
