@@ -7,6 +7,8 @@ from fastapi.templating import Jinja2Templates
 
 import requests
 
+from .scrapper import scrape
+
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
@@ -73,7 +75,16 @@ async def search(
             "link": item.get("link"),
         }
 
-    return results
+    # return results
+
+    # Return the first result
+    link1 = response[0]["link"]
+    # return {"link1": link1}
+
+    return {"content": scrape(link1)}
+
+    # for link in results:
+    #     return {"link": link["link"]}
 
 
 if __name__ == "__main__":
