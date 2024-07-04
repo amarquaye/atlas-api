@@ -81,7 +81,7 @@ async def search(
     link1 = response[0]["link"]
     # return {"link1": link1}
 
-    return {"content": scrape(link1)}
+    return {"content": await scrape(link1)}
 
     # for link in results:
     #     return {"link": link["link"]}

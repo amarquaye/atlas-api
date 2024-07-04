@@ -4,7 +4,7 @@ import pyreqwest_impersonate as pri
 from bs4 import BeautifulSoup
 
 
-def scrape(url: str) -> str:
+async def scrape(url: str) -> str:
     client = pri.Client(impersonate="chrome_124", verify=False)
 
     site = client.get(url)
@@ -14,6 +14,7 @@ def scrape(url: str) -> str:
             if "\t" in soup:
                 soup = soup.replace("\n", "")
                 soup = soup.replace("\t", " ")
+                return soup
             return soup
         else:
             return soup
