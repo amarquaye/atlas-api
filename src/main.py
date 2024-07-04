@@ -32,7 +32,7 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 
 @app.get("/", response_class=HTMLResponse, include_in_schema=False)
-def home(request: Request) -> HTMLResponse:
+async def home(request: Request) -> HTMLResponse:
     context = {"request": request}
     return templates.TemplateResponse("index.html", context)
 
