@@ -11,6 +11,7 @@ async def scrape(url: str) -> str:
     if site.status_code == 200:
         soup = BeautifulSoup(site.text, "lxml").get_text()
         if "\n" in soup:
+            soup = soup.replace("\n", "")
             if "\t" in soup:
                 soup = soup.replace("\n", "")
                 soup = soup.replace("\t", " ")

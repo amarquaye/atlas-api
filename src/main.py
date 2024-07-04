@@ -7,7 +7,7 @@ from fastapi.templating import Jinja2Templates
 
 import requests
 
-from .scrapper import scrape
+from .scraper import scrape
 
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
