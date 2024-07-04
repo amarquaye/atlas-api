@@ -4,3 +4,4 @@ python-decouple==3.8
 slowapi==0.1.9
 requests==2.32.3
 pyreqwest_impersonate
+beautifulsoup4==4.12.3
