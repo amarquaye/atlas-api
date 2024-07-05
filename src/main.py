@@ -117,12 +117,10 @@ async def scrape(
             "link": item.get("link"),
         }
 
-    # return results
+    # Return the url of the indexed result
+    link = response[index]["link"]
 
-    # Return the first result
-    link1 = response[index]["link"]
-
-    return {"content": await scraper(link1)}
+    return {"content": await scraper(link), "source": link}
 
 
 if __name__ == "__main__":
