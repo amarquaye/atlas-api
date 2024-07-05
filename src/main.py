@@ -7,7 +7,7 @@ from fastapi.templating import Jinja2Templates
 
 import requests
 
-from .scraper import scrape
+from .scraper import scraper
 
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
@@ -68,8 +68,50 @@ async def search(
 
     # Extracting the relevant information into a dictionary
     results = {}
-    for index, item in enumerate(response):
+    for index, item in enumerate(response, start=1):
         results[index] = {
+            "title": item.get("title"),
+            "snippet": item.get("snippet"),
+            "link": item.get("link"),
+        }
+
+    return results
+
+
+@app.get("/api/s", tags=["Test endpoints"])
+@limiter.limit("3/minute")
+async def scrape(
+    request: Request,
+    query: str = Query(None, description="Query to search the web"),
+    index: int = Query(1, description="The search index", le=10),
+) -> dict:
+    """Scrape the web.
+
+    Crawls the web for queries and returns the content of he search in json.
+
+    Parameters
+    ----------
+    query : str, optional
+        Search query, by default Query(None, description="Query to search the web")
+
+    Returns
+    -------
+    json
+        Response from the search.
+    """
+    url = "https://www.googleapis.com/customsearch/v1"
+    params = {
+        "q": query,
+        "key": config("GCSC_API_KEY"),
+        "cx": config("GOOGLE_SEARCH_ENGINE_ID"),
+    }
+
+    response = requests.get(url, params=params).json()["items"]
+
+    # Extracting the relevant information into a dictionary
+    results = {}
+    for idx, item in enumerate(response, start=1):
+        results[idx] = {
             "title": item.get("title"),
             "snippet": item.get("snippet"),
             "link": item.get("link"),
@@ -78,13 +120,9 @@ async def search(
     # return results
 
     # Return the first result
-    link1 = response[0]["link"]
-    # return {"link1": link1}
+    link1 = response[index]["link"]
 
-    return {"content": await scrape(link1)}
-
-    # for link in results:
-    #     return {"link": link["link"]}
+    return {"content": await scraper(link1)}
 
 
 if __name__ == "__main__":

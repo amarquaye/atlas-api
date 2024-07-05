@@ -4,7 +4,7 @@ import pyreqwest_impersonate as pri
 from bs4 import BeautifulSoup
 
 
-async def scrape(url: str) -> str:
+async def scraper(url: str) -> str:
     client = pri.Client(impersonate="chrome_124", verify=False)
 
     site = client.get(url)
