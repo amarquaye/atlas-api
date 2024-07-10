@@ -1,3 +1,5 @@
+import aiohttp
+
 from decouple import config
 
 from fastapi import FastAPI, Query, Request
@@ -5,7 +7,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-import requests
+from .scraper import scraper
 
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
@@ -16,7 +18,7 @@ app = FastAPI(
     title="Atlas",
     summary="Hallucination-detecting API.",
     description="Search the web for queries and compare results with LLM to detect and mitigate hallucinations.\nDeveloped by Jesse Amarquaye.",
-    version="0.1.0",
+    version="0.2.0",
 )
 
 app.mount("/static", StaticFiles(directory="src/static"), name="static")
@@ -30,7 +32,7 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 
 @app.get("/", response_class=HTMLResponse, include_in_schema=False)
-def home(request: Request) -> HTMLResponse:
+async def home(request: Request) -> HTMLResponse:
     context = {"request": request}
     return templates.TemplateResponse("index.html", context)
 
@@ -48,13 +50,14 @@ async def search(
     Parameters
     ----------
     query : str, optional
-        Search query, by default Query(None, description="Query to search the web")
+        Query to search the web.
 
     Returns
     -------
     json
         Response from the search.
     """
+
     url = "https://www.googleapis.com/customsearch/v1"
     params = {
         "q": query,
@@ -62,18 +65,60 @@ async def search(
         "cx": config("GOOGLE_SEARCH_ENGINE_ID"),
     }
 
-    response = requests.get(url, params=params).json()["items"]
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url, params=params) as response:
+            response = await response.json()
+            response = response["items"]
 
     # Extracting the relevant information into a dictionary
     results = {}
-    for index, item in enumerate(response):
-        results[index] = {
+    for idx, item in enumerate(response, start=1):
+        results[idx] = {
             "title": item.get("title"),
             "snippet": item.get("snippet"),
             "link": item.get("link"),
         }
 
     return results
+
+
+@app.get("/api/scraper", tags=["Test endpoints"])
+@limiter.limit("3/minute")
+async def scrape(
+    request: Request,
+    query: str = Query(None, description="Query to search the web"),
+    index: int = Query(1, description="The search index", le=10),
+) -> dict:
+    """Crawls the web and returns the content.
+
+    Parameters
+    ----------
+    query : str, optional
+        Query to search the web.
+    index : int, optional
+        The search index. Should be less than or equal to 10 (since the limit of the results is 10).
+
+    Returns
+    -------
+    dict
+        Content of the site requested (index).
+    """
+
+    url = "https://www.googleapis.com/customsearch/v1"
+    params = {
+        "q": query,
+        "key": config("GCSC_API_KEY"),
+        "cx": config("GOOGLE_SEARCH_ENGINE_ID"),
+    }
+
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url, params=params) as response:
+            response = await response.json()
+            response = response["items"]
+
+    link = response[index]["link"]
+
+    return {"content": scraper(link), "source": link}
 
 
 if __name__ == "__main__":
