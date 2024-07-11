@@ -10,7 +10,7 @@ def scraper(url: str) -> str:
     if site.status_code == 200:
         soup = BeautifulSoup(site.text, "lxml").get_text()
 
-        return soup.replace('\n', '').replace('\t', '').replace('\r', '')
+        return soup.replace("\n", "").replace("\t", "").replace("\r", "")
     else:
         return f"Cannot get the content of {url}!"
 
