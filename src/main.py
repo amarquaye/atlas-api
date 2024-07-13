@@ -7,6 +7,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
+from .gemini import generate_query
 from .scraper import scraper, reader
 
 from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -185,6 +186,15 @@ async def jina_reader(
     link = response[index]["link"]
 
     return {"content": reader(link), "source": link}
+
+
+# TODO: This is a test feature, might be implemented in the future.
+@app.get("/api/refine", tags=["Beta endpoints"])
+@limiter.limit("3/minute")
+def refine_text(
+    request: Request, query: str = Query(None, description="Search query")
+) -> dict:
+    return {"Query": generate_query(query)}
 
 
 if __name__ == "__main__":
