@@ -7,10 +7,8 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from .gemini import generate_query  # New feature
+from .gemini import generate_query
 from .scraper import scraper, reader
-
-import os  # New feature
 
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address

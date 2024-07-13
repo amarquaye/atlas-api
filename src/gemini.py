@@ -7,8 +7,6 @@ See the getting started guide for more information:
 https://ai.google.dev/gemini-api/docs/get-started/python
 """
 
-import os
-
 from decouple import config
 
 import google.generativeai as genai
