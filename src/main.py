@@ -8,11 +8,11 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from .gemini import generate_query
-from .scraper import scraper, reader
+from .utils import scraper, reader
 
-from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.util import get_remote_address
-from slowapi.errors import RateLimitExceeded
+# from slowapi import Limiter, _rate_limit_exceeded_handler
+# from slowapi.util import get_remote_address
+# from slowapi.errors import RateLimitExceeded
 
 
 app = FastAPI(
@@ -27,9 +27,9 @@ app.mount("/static", StaticFiles(directory="src/static"), name="static")
 templates = Jinja2Templates(directory="src/templates")
 
 
-limiter = Limiter(key_func=get_remote_address)
-app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+# limiter = Limiter(key_func=get_remote_address)
+# app.state.limiter = limiter
+# app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 
 @app.get("/", response_class=HTMLResponse, include_in_schema=False)
@@ -39,7 +39,7 @@ async def home(request: Request) -> HTMLResponse:
 
 
 @app.get("/api", tags=["Endpoints"])
-@limiter.limit("3/minute")
+# @limiter.limit("3/minute")
 async def search(
     request: Request,
     query: str = Query(None, description="Query to search the web"),
@@ -71,19 +71,18 @@ async def search(
             response = await response.json()
             response = response["items"]
 
-    results = {}
-    for idx, item in enumerate(response, start=1):
-        results[idx] = {
-            "title": item.get("title"),
-            "snippet": item.get("snippet"),
-            "link": item.get("link"),
+        return {
+            idx: {
+                "title": item.get("title"),
+                "snippet": item.get("snippet"),
+                "link": item.get("link"),
+            }
+            for idx, item in enumerate(response, start=1)
         }
-
-    return results
 
 
 @app.get("/api/scraper", tags=["Endpoints"])
-@limiter.limit("3/minute")
+# @limiter.limit("3/minute")
 async def scrape(
     request: Request,
     query: str = Query(None, description="Query to search the web"),
@@ -123,7 +122,7 @@ async def scrape(
 
 # TODO: Remove these soon as they are just a proof of concept.
 @app.get("/api/jina/search", tags=["Beta endpoints"])
-@limiter.limit("3/minute")
+# @limiter.limit("3/minute")
 async def jina_search(
     request: Request,
     query: str = Query(None, description="Query to search the web"),
@@ -150,7 +149,7 @@ async def jina_search(
 
 
 @app.get("/api/scraper/jina/reader", tags=["Beta endpoints"])
-@limiter.limit("3/minute")
+# @limiter.limit("3/minute")
 async def jina_reader(
     request: Request,
     query: str = Query(None, description="Query to search the web"),
@@ -190,7 +189,7 @@ async def jina_reader(
 
 # TODO: This is a test feature, might be implemented in the future.
 @app.get("/api/refine", tags=["Beta endpoints"])
-@limiter.limit("3/minute")
+# @limiter.limit("3/minute")
 def refine_text(
     request: Request, query: str = Query(None, description="Search query")
 ) -> dict:

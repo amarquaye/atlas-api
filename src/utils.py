@@ -1,14 +1,14 @@
 import re
-import pyreqwest_impersonate as pri
+import primp
 from bs4 import BeautifulSoup
 
 
 def scraper(url: str) -> str:
-    client = pri.Client(impersonate="chrome_124", verify=False)
-    site = client.get(url)
+    client = primp.Client(impersonate="chrome_124", verify=False)
+    resp = client.get(url)
 
-    if site.status_code == 200:
-        soup = BeautifulSoup(site.text, "lxml").get_text()
+    if resp.status_code == 200:
+        soup = BeautifulSoup(resp.text, "lxml").get_text()
 
         return soup.replace("\n", "").replace("\t", "").replace("\r", "")
     else:
@@ -16,10 +16,10 @@ def scraper(url: str) -> str:
 
 
 def reader(url) -> str:
-    client = pri.Client(impersonate="chrome_124", verify=False)
-    site = client.get(url="https://r.jina.ai/" + url)
-    if site.status_code == 200:
-        return site.text
+    client = primp.Client(impersonate="chrome_124", verify=False)
+    resp = client.get(url="https://r.jina.ai/" + url)
+    if resp.status_code == 200:
+        return resp.text
     else:
         return f"Cannot get the content of {url}!"
 
