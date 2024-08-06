@@ -3,8 +3,8 @@ Jinja2==3.1.4
 python-decouple==3.8
 slowapi==0.1.9
 requests==2.32.3
-pyreqwest_impersonate==0.4.9
+primp==0.5.5
 beautifulsoup4==4.12.3
 lxml==5.2.2
 aiohttp[speedups]
-google-generativeai
+google-generativeai==0.7.2
