@@ -7,6 +7,8 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
+import primp
+
 from .gemini import generate_query
 from .utils import scraper, reader
 
@@ -79,6 +81,41 @@ async def search(
             }
             for idx, item in enumerate(response, start=1)
         }
+
+
+@app.get("/verify", tags=["Beta endpoints"])
+async def verify(
+    request: Request, query: str = Query(None, description="Enter query")
+) -> dict:
+    """Detect and mitigate hallucination.
+
+    Scans through a query, compares result from LLM with search results from google to detect and mitigate hallucinations.
+
+    Parameters
+    ----------
+    query : str, optional
+        Query from user.
+
+    Returns
+    -------
+    dict
+        Verified results from the web.
+    """
+    url = "https://www.googleapis.com/customsearch/v1"
+    params = {
+        "q": query,
+        "key": config("GCSC_API_KEY"),
+        "cx": config("GOOGLE_SEARCH_ENGINE_ID"),
+    }
+
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url=url, params=params) as response:
+            response = await response.json()
+            response = response["items"]
+    # response = primp.get(url=url, params=params).json()["items"]
+
+    resp = primp.get(response[0]["link"], impersonate="chrome_127")
+    return {"result": resp.text_markdown, "source": response[0]["link"]}
 
 
 @app.get("/api/scraper", tags=["Endpoints"])

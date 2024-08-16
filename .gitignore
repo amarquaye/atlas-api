@@ -52,7 +52,6 @@ coverage.xml
 cover/
 
 # My stuff
-__init__.py
 tests/
 
 # Translations
