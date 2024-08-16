@@ -9,8 +9,7 @@ from fastapi.templating import Jinja2Templates
 
 import primp
 
-from .gemini import generate_query
-from .utils import scraper, reader
+from .gemini import cmp, generate_query
 
 # from slowapi import Limiter, _rate_limit_exceeded_handler
 # from slowapi.util import get_remote_address
@@ -60,7 +59,6 @@ async def search(
     json
         Response from the search.
     """
-
     url = "https://www.googleapis.com/customsearch/v1"
     params = {
         "q": query,
@@ -85,7 +83,9 @@ async def search(
 
 @app.get("/verify", tags=["Beta endpoints"])
 async def verify(
-    request: Request, query: str = Query(None, description="Enter query")
+    request: Request,
+    llm_query: str = Query(None, description="Enter LLM input"),
+    llm_response: str = Query(None, description="Enter LLM output"),
 ) -> dict:
     """Detect and mitigate hallucination.
 
@@ -98,48 +98,10 @@ async def verify(
 
     Returns
     -------
-    dict
+    json
         Verified results from the web.
     """
-    url = "https://www.googleapis.com/customsearch/v1"
-    params = {
-        "q": query,
-        "key": config("GCSC_API_KEY"),
-        "cx": config("GOOGLE_SEARCH_ENGINE_ID"),
-    }
-
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url=url, params=params) as response:
-            response = await response.json()
-            response = response["items"]
-    # response = primp.get(url=url, params=params).json()["items"]
-
-    resp = primp.get(response[0]["link"], impersonate="chrome_127")
-    return {"result": resp.text_markdown, "source": response[0]["link"]}
-
-
-@app.get("/api/scraper", tags=["Endpoints"])
-# @limiter.limit("3/minute")
-async def scrape(
-    request: Request,
-    query: str = Query(None, description="Query to search the web"),
-    index: int = Query(1, description="The search index", le=10),
-) -> dict:
-    """Crawls the web and returns the content.
-
-    Parameters
-    ----------
-    query : str, optional
-        Query to search the web.
-    index : int, optional
-        The search index. Should be less than or equal to 10 (since the limit of the results is 10).
-
-    Returns
-    -------
-    json
-        Content of the site requested (index).
-    """
-
+    query = generate_query(llm_query)
     url = "https://www.googleapis.com/customsearch/v1"
     params = {
         "q": query,
@@ -152,9 +114,21 @@ async def scrape(
             response = await response.json()
             response = response["items"]
 
-    link = response[index]["link"]
+    if str(response[0]["link"]).startswith("https://www.quora.com"):
+        resp = primp.get(
+            url="https://r.jina.ai/" + str(response[0]["link"]),
+            impersonate="chrome_127",
+        )
+    else:
+        resp = primp.get(response[0]["link"], impersonate="chrome_127")
+        # return {"result": resp.text_markdown, "source": response[0]["link"]}
 
-    return {"content": scraper(link), "source": link}
+    return {
+        "Response": cmp(
+            llm_response=llm_response, search_result=resp.text_markdown
+        ),
+        "source": response[0]["link"],
+    }
 
 
 # TODO: Remove these soon as they are just a proof of concept.
@@ -178,59 +152,10 @@ async def jina_search(
     json
         Response from the search.
     """
-
     async with aiohttp.ClientSession() as session:
         async with session.get(url="https://s.jina.ai/" + query) as response:
             response = await response.text()
             return {"response": response}
-
-
-@app.get("/api/scraper/jina/reader", tags=["Beta endpoints"])
-# @limiter.limit("3/minute")
-async def jina_reader(
-    request: Request,
-    query: str = Query(None, description="Query to search the web"),
-    index: int = Query(1, description="The search index", le=10),
-) -> dict:
-    """Crawls the web and returns the content.
-
-    Parameters
-    ----------
-    query : str, optional
-        Query to search the web.
-    index : int, optional
-        The search index. Should be less than or equal to 10 (since the limit of the results is 10).
-
-    Returns
-    -------
-    json
-        Content of the site requested (index).
-    """
-
-    url = "https://www.googleapis.com/customsearch/v1"
-    params = {
-        "q": query,
-        "key": config("GCSC_API_KEY"),
-        "cx": config("GOOGLE_SEARCH_ENGINE_ID"),
-    }
-
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url=url, params=params) as response:
-            response = await response.json()
-            response = response["items"]
-
-    link = response[index]["link"]
-
-    return {"content": reader(link), "source": link}
-
-
-# TODO: This is a test feature, might be implemented in the future.
-@app.get("/api/refine", tags=["Beta endpoints"])
-# @limiter.limit("3/minute")
-def refine_text(
-    request: Request, query: str = Query(None, description="Search query")
-) -> dict:
-    return {"Query": generate_query(query)}
 
 
 if __name__ == "__main__":
