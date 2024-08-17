@@ -11,16 +11,16 @@ import primp
 
 from .gemini import cmp, generate_query
 
-# from slowapi import Limiter, _rate_limit_exceeded_handler
-# from slowapi.util import get_remote_address
-# from slowapi.errors import RateLimitExceeded
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
 
 app = FastAPI(
     title="Atlas API",
     summary="Hallucination-detecting API.",
     description="Search the web for queries and compare results with LLM to detect and mitigate hallucinations.\nDeveloped by Jesse Amarquaye.",
-    version="0.3.0",
+    version="1.0.0",
 )
 
 app.mount("/static", StaticFiles(directory="src/static"), name="static")
@@ -28,9 +28,9 @@ app.mount("/static", StaticFiles(directory="src/static"), name="static")
 templates = Jinja2Templates(directory="src/templates")
 
 
-# limiter = Limiter(key_func=get_remote_address)
-# app.state.limiter = limiter
-# app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 
 @app.get("/", response_class=HTMLResponse, include_in_schema=False)
@@ -40,7 +40,7 @@ async def home(request: Request) -> HTMLResponse:
 
 
 @app.get("/api", tags=["Endpoints"])
-# @limiter.limit("3/minute")
+@limiter.limit("3/minute")
 async def search(
     request: Request,
     query: str = Query(None, description="Query to search the web"),
@@ -81,7 +81,8 @@ async def search(
         }
 
 
-@app.get("/verify", tags=["Beta endpoints"])
+@app.get("/verify", tags=["Endpoints"])
+@limiter.limit("3/minute")
 async def verify(
     request: Request,
     llm_query: str = Query(None, description="Enter LLM input"),
@@ -121,7 +122,6 @@ async def verify(
         )
     else:
         resp = primp.get(response[0]["link"], impersonate="chrome_127")
-        # return {"result": resp.text_markdown, "source": response[0]["link"]}
 
     return {
         "response": cmp(
@@ -131,9 +131,8 @@ async def verify(
     }
 
 
-# TODO: Remove these soon as they are just a proof of concept.
-@app.get("/api/jina/search", tags=["Beta endpoints"])
-# @limiter.limit("3/minute")
+@app.get("/search", tags=["Endpoints"])
+@limiter.limit("3/minute")
 async def jina_search(
     request: Request,
     query: str = Query(None, description="Query to search the web"),
