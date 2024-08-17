@@ -124,7 +124,7 @@ async def verify(
         # return {"result": resp.text_markdown, "source": response[0]["link"]}
 
     return {
-        "Response": cmp(
+        "response": cmp(
             llm_response=llm_response, search_result=resp.text_markdown
         ),
         "source": response[0]["link"],
