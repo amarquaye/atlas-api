@@ -34,7 +34,7 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 
 @app.get("/", response_class=HTMLResponse, include_in_schema=False)
-async def home(request: Request) -> HTMLResponse:
+def home(request: Request) -> HTMLResponse:
     context = {"request": request}
     return templates.TemplateResponse("index.html", context)
 
@@ -94,8 +94,10 @@ async def verify(
 
     Parameters
     ----------
-    query : str, optional
+    llm_query : str, optional
         Query from user.
+    llm_response : str, optional
+        Response from LLM.
 
     Returns
     -------
@@ -116,6 +118,11 @@ async def verify(
             response = response["items"]
 
     if str(response[0]["link"]).startswith("https://www.quora.com"):
+        resp = primp.get(
+            url="https://r.jina.ai/" + str(response[0]["link"]),
+            impersonate="chrome_127",
+        )
+    elif str(response[0]["link"]).startswith("https://www.findlaw.com"):
         resp = primp.get(
             url="https://r.jina.ai/" + str(response[0]["link"]),
             impersonate="chrome_127",
@@ -160,4 +167,4 @@ async def jina_search(
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app)
+    uvicorn.run(app, log_level=config("LOG_LEVEL"))

@@ -56,8 +56,9 @@ def cmp(llm_response: str, search_result: str) -> str:
         Sometimes you claim some responses contain hallucinations even though the response from the LLM is almost inline with the search results.
         Only raise the alert of a hallucination detection when the LLM's response completely deviates from the search results and see through both responses yourself and determine if the LLM's response is truly hallucinating.
         If there is any hallucination detected, return the text response: Hallucination detected.
-        Then a json object with key of 'LLM response' with the value being the part of the LLM's response where the hallucination occurred. 
-        And another key of 'Search result' with the value being the refined section of the search result which shows the correct answer as compared to the llm's response. 
+        Then return 'LLM response:' with the value being the part of the LLM's response where the hallucination occurred. 
+        And then 'Search result:' with the value being the refined section of the search result which shows the correct answer as compared to the llm's response. 
+        Do not include '\n' in your response since your response will be used in a web page;the contents of your response will replace the hallucinated response from the LLM. 
         Or return No hallucination if the llm_response and search_result are aligned and there is no hallucination after comparing both responses.        
         """,
     )
