@@ -3,26 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verify API</title>
+    <title>ATLAS API</title>
     <link rel="stylesheet" href="{{ url_for('static', path='/css/try_style.css') }}">
 </head>
 <body>
     <div class="container">
-        <h1>ATLAS API</h1>
+        <h1>Try ATLAS</h1>
         <div class="input-container">
             <div class="input-field">
                 <label for="llm-query">LLM Query:</label>
-                <textarea id="llm-query" placeholder="Enter the LLM's query"></textarea>
+                <textarea id="llm-query" placeholder="Enter the LLM query"></textarea>
             </div>
             <div class="input-field">
                 <label for="llm-response">LLM Response:</label>
-                <textarea id="llm-response" placeholder="Enter the LLM's response"></textarea>
+                <textarea id="llm-response" placeholder="Enter the LLM response"></textarea>
             </div>
         </div>
         <button id="submit-btn">Verify</button>
         <div class="result-container">
             <div class="result-box">
-                <pre id="result-text"></pre>
+                <div id="response-container">
+                    <h3>Response:</h3>
+                    <p id="response-text"></p>
+                </div>
+                <div id="source-container">
+                    <h3>Source:</h3>
+                    <p id="source-text"></p>
+                </div>
                 <button id="copy-btn">Copy</button>
             </div>
         </div>

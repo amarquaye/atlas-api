@@ -92,3 +92,14 @@ h1 {
     border-radius: 6px;
     cursor: pointer;
 }
+
+#response-container, #source-container {
+    margin-bottom: 1rem;
+}
+
+#response-text, #source-text {
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 0.5rem;
+    border-radius: 8px;
+    white-space: pre-wrap;
+}

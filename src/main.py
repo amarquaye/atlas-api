@@ -21,7 +21,7 @@ app = FastAPI(
     title="Atlas API",
     summary="Hallucination-detecting API.",
     description="Search the web for queries and compare results with LLM to detect and mitigate hallucinations.\nDeveloped by Jesse Amarquaye.",
-    version="1.0.1",
+    version="1.0.2",
 )
 
 origins = ["https://atlasproject-brown.vercel.app"]
