@@ -3,6 +3,7 @@ import aiohttp
 from decouple import config
 
 from fastapi import FastAPI, Query, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -23,6 +24,16 @@ app = FastAPI(
     version="1.0.0",
 )
 
+origins = ["https://atlasproject-brown.vercel.app"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["GET"],
+    allow_headers=["*"],
+)
+
 app.mount("/static", StaticFiles(directory="src/static"), name="static")
 
 templates = Jinja2Templates(directory="src/templates")
@@ -37,6 +48,12 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 def home(request: Request) -> HTMLResponse:
     context = {"request": request}
     return templates.TemplateResponse("index.html", context)
+
+
+@app.get("/try", response_class=HTMLResponse, include_in_schema=False)
+def test(request: Request) -> HTMLResponse:
+    context = {"request": request}
+    return templates.TemplateResponse("try.html", context)
 
 
 @app.get("/api", tags=["Endpoints"])
@@ -167,4 +184,4 @@ async def jina_search(
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, log_level=config("LOG_LEVEL"))
+    uvicorn.run(app)

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify API</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/try_style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>ATLAS API</h1>
+        <div class="input-container">
+            <div class="input-field">
+                <label for="llm-query">LLM Query:</label>
+                <textarea id="llm-query" placeholder="Enter the LLM's query"></textarea>
+            </div>
+            <div class="input-field">
+                <label for="llm-response">LLM Response:</label>
+                <textarea id="llm-response" placeholder="Enter the LLM's response"></textarea>
+            </div>
+        </div>
+        <button id="submit-btn">Verify</button>
+        <div class="result-container">
+            <div class="result-box">
+                <pre id="result-text"></pre>
+                <button id="copy-btn">Copy</button>
+            </div>
+        </div>
+    </div>
+    <script src="{{ url_for('static', path='/js/try_script.js') }}"></script>
+</body>
+</html>
