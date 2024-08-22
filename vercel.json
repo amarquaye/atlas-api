@@ -9,7 +9,9 @@
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "src/main.py"
+      "dest": "src/main.py",
+      "maxDuration": 59
     }
   ]
 }
+
