@@ -24,3 +24,8 @@ document.getElementById('submit-btn').addEventListener('click', async () => {
 
 const modeToggle = document.getElementById('mode-toggle');
 const html = document.documentElement;
+
+modeToggle.addEventListener('click', () => {
+    html.classList.toggle('dark-mode');
+    modeToggle.textContent = html.classList.contains('dark-mode') ? 'Light Mode' : 'Dark Mode';
+})

@@ -21,11 +21,10 @@ app = FastAPI(
     title="Atlas API",
     summary="Hallucination-detecting API.",
     description="Search the web for queries and compare results with LLM to detect and mitigate hallucinations.\nDeveloped by Jesse Amarquaye.",
-    version="1.0.2",
+    version="1.0.3",
 )
 
 origins = ["https://atlasproject-brown.vercel.app"]
-
 
 app.add_middleware(
     CORSMiddleware,
@@ -130,30 +129,36 @@ async def verify(
         "cx": config("GOOGLE_SEARCH_ENGINE_ID"),
     }
 
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url=url, params=params) as response:
-            response = await response.json()
-            response = response["items"]
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url=url, params=params) as response:
+                response = await response.json()
+                response = response["items"]
 
-    if str(response[0]["link"]).startswith("https://www.quora.com"):
-        resp = primp.get(
-            url="https://r.jina.ai/" + str(response[0]["link"]),
-            impersonate="chrome_127",
-        )
-    elif str(response[0]["link"]).startswith("https://www.findlaw.com"):
-        resp = primp.get(
-            url="https://r.jina.ai/" + str(response[0]["link"]),
-            impersonate="chrome_127",
-        )
-    else:
-        resp = primp.get(response[0]["link"], impersonate="chrome_127")
+        if str(response[0]["link"]).startswith("https://www.quora.com"):
+            resp = primp.get(
+                url="https://r.jina.ai/" + str(response[0]["link"]),
+                impersonate="chrome_127",
+            )
+        elif str(response[0]["link"]).startswith("https://www.findlaw.com"):
+            resp = primp.get(
+                url="https://r.jina.ai/" + str(response[0]["link"]),
+                impersonate="chrome_127",
+            )
+        else:
+            resp = primp.get(response[0]["link"], impersonate="chrome_127")
 
-    return {
-        "response": cmp(
-            llm_response=llm_response, search_result=resp.text_markdown
-        ),
-        "source": response[0]["link"],
-    }
+        return {
+            "response": cmp(
+                llm_response=llm_response, search_result=resp.text_markdown
+            ),
+            "source": response[0]["link"],
+        }
+    except Exception as e:
+        return {
+            "response": "Oops... Something went wrong. Please try again later!",
+            "source": str(e),
+        }
 
 
 @app.get("/search", tags=["Endpoints"])
@@ -176,10 +181,17 @@ async def jina_search(
     json
         Response from the search.
     """
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url="https://s.jina.ai/" + query) as response:
-            response = await response.text()
-            return {"response": response}
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                url="https://s.jina.ai/" + query
+            ) as response:
+                response = await response.text()
+                return {"response": response}
+    except Exception:
+        return {
+            "response": "Oops... Something went wrong. Please try agin later!"
+        }
 
 
 if __name__ == "__main__":

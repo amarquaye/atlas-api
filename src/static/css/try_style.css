@@ -6,7 +6,7 @@
     --glass-bg: rgba(255, 255, 255, 0.7);
     --glass-border: rgba(255, 255, 255, 0.2);
     --glass-shadow: rgba(0, 0, 0, 0.1);
-    --button-bg: #007aff;
+    --button-bg: #ec008c;
     --button-text: #ffffff;
 }
 
@@ -16,7 +16,7 @@
     --glass-bg: rgba(30, 30, 30, 0.7);
     --glass-border: rgba(255, 255, 255, 0.1);
     --glass-shadow: rgba(0, 0, 0, 0.2);
-    --button-bg: #0a84ff;
+    --button-bg: #ec008c;
     --button-text: #ffffff;
 }
 
