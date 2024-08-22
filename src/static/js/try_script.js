@@ -6,14 +6,21 @@ document.getElementById('submit-btn').addEventListener('click', async () => {
         const res = await fetch(`https://atlasproject-brown.vercel.app/verify?llm_query=${encodeURIComponent(llmQuery)}&llm_response=${encodeURIComponent(llmResponse)}`);
         const data = await res.json();
 
-        document.getElementById('response-text').textContent = data.response.replace(/\n/g, ' ');
-        document.getElementById('source-text').textContent = data.source.replace(/\n/g, ' ');
+        const formattedResponse = data.response.replace(/\n/g, ' ');
+        const formattedSource = data.source.replace(/\n/g, ' ');
+
+        document.getElementById('response-text').textContent = formattedResponse;
+        document.getElementById('source-text').textContent = formattedSource;
 
         document.getElementById('copy-btn').addEventListener('click', () => {
-            navigator.clipboard.writeText(JSON.stringify(data, null, 2));
-            alert('Result copied to clipboard!');
+            const textToCopy = `Response: ${formattedResponse}\n\nSource: ${formattedSource}`;
+            navigator.clipboard.writeText(textToCopy);
+            alert('Response copied to clipboard!');
         });
     } catch (error) {
         alert('Error: ' + error.message);
     }
 });
+
+const modeToggle = document.getElementById('mode-toggle');
+const html = document.documentElement;

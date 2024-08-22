@@ -1,27 +1,27 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark-mode">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ATLAS API</title>
+    <title>Try ATLAS</title>
     <link rel="stylesheet" href="{{ url_for('static', path='/css/try_style.css') }}">
 </head>
 <body>
     <div class="container">
-        <h1>Try ATLAS</h1>
+        <h1>Verify LLM Response</h1>
         <div class="input-container">
-            <div class="input-field">
+            <div class="input-field glass">
                 <label for="llm-query">LLM Query:</label>
                 <textarea id="llm-query" placeholder="Enter the LLM query"></textarea>
             </div>
-            <div class="input-field">
+            <div class="input-field glass">
                 <label for="llm-response">LLM Response:</label>
                 <textarea id="llm-response" placeholder="Enter the LLM response"></textarea>
             </div>
         </div>
         <button id="submit-btn">Verify</button>
         <div class="result-container">
-            <div class="result-box">
+            <div class="result-box glass">
                 <div id="response-container">
                     <h3>Response:</h3>
                     <p id="response-text"></p>
