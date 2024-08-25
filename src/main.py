@@ -24,7 +24,7 @@ app = FastAPI(
     version="1.0.3",
 )
 
-origins = ["https://atlasproject-brown.vercel.app"]
+origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
