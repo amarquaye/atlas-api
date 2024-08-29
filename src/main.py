@@ -66,7 +66,7 @@ async def search(
 ) -> dict:
     """Search the web.
 
-    Crawls the web for queries and returns the results of he search in json.
+    Returns the results from a google search in json.
 
     Parameters
     ----------

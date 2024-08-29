@@ -3,7 +3,7 @@ document.getElementById('submit-btn').addEventListener('click', async () => {
     const llmResponse = document.getElementById('llm-response').value;
 
     try {
-        const res = await fetch(`http://localhost:8000/verify?llm_query=${encodeURIComponent(llmQuery)}&llm_response=${encodeURIComponent(llmResponse)}`);
+        const res = await fetch(`https://atlasproject-pink.vercel.app/verify?llm_query=${encodeURIComponent(llmQuery)}&llm_response=${encodeURIComponent(llmResponse)}`);
         const data = await res.json();
 
         const formattedResponse = data.response.replace(/\n/g, ' ');
