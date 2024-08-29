@@ -42,7 +42,7 @@ def generate_query(query: str) -> str:
     return response.text
 
 
-def cmp(llm_response: str, search_result: str) -> str:
+def cmp(llm_response: str, search_result: str, source: str) -> str:
     model = genai.GenerativeModel(
         model_name="gemini-1.5-flash",
         generation_config=generation_config,
@@ -55,16 +55,17 @@ def cmp(llm_response: str, search_result: str) -> str:
         Look at both results and if they are similar do not return Hallucination detected.
         Sometimes you claim some responses contain hallucinations even though the response from the LLM is almost inline with the search results.
         Only raise the alert of a hallucination detection when the LLM's response completely deviates from the search results and see through both responses yourself and determine if the LLM's response is truly hallucinating.
-        If there is any hallucination detected, return the text response: Hallucination detected.
-        Then return 'LLM response:' with the value being the part of the LLM's response where the hallucination occurred. 
-        And then 'Search result:' with the value being the refined section of the search result which shows the correct answer as compared to the llm's response. 
+        If there is any hallucination detected, return the a json object with key named response with a value of Hallucination detected.
+        Then return another key named llm response with the value being the part of the LLM's response where the hallucination occurred. 
+        And then another key named search result with the value being the refined section of the search result which shows the correct answer as compared to the llm's response. 
+        And then another key named source which is the third argument or parameter in the function and give it value being the value of the argument.
         Do not include '\n' in your response since your response will be used in a web page;the contents of your response will replace the hallucinated response from the LLM. 
         Or return No hallucination if the llm_response and search_result are aligned and there is no hallucination after comparing both responses.        
         """,
     )
     chat_session = model.start_chat(history=[])
     response = chat_session.send_message(
-        f"The LLM's response is {llm_response} and the search results is {search_result}"
+        f"The LLM's response is {llm_response},the search results is {search_result} and the source is {source}"
     )
 
     return response.text

@@ -8,6 +8,8 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
+import json
+
 import primp
 
 from .gemini import cmp, generate_query
@@ -145,15 +147,23 @@ async def verify(
                 url="https://r.jina.ai/" + str(response[0]["link"]),
                 impersonate="chrome_127",
             )
+        elif str(response[0]["link"]).startswith("https://www.youtube.com"):
+            resp = primp.get(
+                url=response[1]["link"],
+                impersonate="chrome_127",
+            )
         else:
             resp = primp.get(response[0]["link"], impersonate="chrome_127")
 
-        return {
-            "response": cmp(
-                llm_response=llm_response, search_result=resp.text_markdown
-            ),
-            "source": response[0]["link"],
-        }
+        res = cmp(
+            llm_response=llm_response,
+            search_result=resp.text_markdown,
+            source=str(response[0]["link"]),
+        )
+        res = res.strip("'")
+        res = json.loads(res)
+        return res
+
     except Exception as e:
         return {
             "response": "Oops... Something went wrong. Please try again later!",
