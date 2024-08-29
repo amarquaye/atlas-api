@@ -114,7 +114,7 @@ h1 {
     margin-bottom: 1rem;
 }
 
-#response-text, #source-text {
+#response-text, #source-text, #llm_response-text, #search_result-text {
     white-space: pre-wrap;
     word-break: break-word;
 }

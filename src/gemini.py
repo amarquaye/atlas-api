@@ -20,7 +20,7 @@ generation_config = {
     "top_p": 0.95,
     "top_k": 64,
     "max_output_tokens": 8192,
-    "response_mime_type": "text/plain",
+    "response_mime_type": "application/json",
 }
 
 
@@ -55,6 +55,7 @@ def cmp(llm_response: str, search_result: str, source: str) -> str:
         Look at both results and if they are similar do not return Hallucination detected.
         Sometimes you claim some responses contain hallucinations even though the response from the LLM is almost inline with the search results.
         Only raise the alert of a hallucination detection when the LLM's response completely deviates from the search results and see through both responses yourself and determine if the LLM's response is truly hallucinating.
+        You are to return a json object response.
         If there is any hallucination detected, return the a json object with key named 'response' with a value of Hallucination detected.
         Then return another key named 'llm_response' with the value being the part of the LLM's response where the hallucination occurred. 
         And then another key named 'search_result' with the value being the refined section of the search result which shows the correct answer as compared to the llm's response. 
