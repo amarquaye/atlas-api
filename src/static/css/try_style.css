@@ -110,11 +110,11 @@ h1 {
     margin-top: 2rem;
 }
 
-#response-container, #source-container {
+#response-container, #source-container, #llm_response-container, #search_result-container {
     margin-bottom: 1rem;
 }
 
-#response-text, #source-text {
+#response-text, #source-text, #llm_response-text, #search_result-text {
     white-space: pre-wrap;
     word-break: break-word;
 }
