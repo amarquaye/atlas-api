@@ -22,8 +22,18 @@ from slowapi.errors import RateLimitExceeded
 app = FastAPI(
     title="Atlas API",
     summary="Hallucination-detecting API.",
-    description="Search the web for queries and compare results with LLM to detect and mitigate hallucinations.\nDeveloped by Jesse Amarquaye.",
+    description="🌐Search the web for queries and compare results with LLM to detect and mitigate hallucinations.",
     version="1.0.4",
+    terms_of_service="https://github.com/atlas-api",
+    contact={
+        "name": "Jesse Amarquaye",
+        "url": "https://atlasproject-phi.vercel.app",
+        "email": "engineeramarquaye@gmail.com",
+    },
+    license_info={
+        "name": "MIT",
+        "url": "https://github.com/amarquaye/atlas-api/blob/master/LICENSE",
+    },
 )
 
 origins = ["*"]
@@ -58,7 +68,12 @@ def test(request: Request) -> HTMLResponse:
     return templates.TemplateResponse("try.html", context)
 
 
-@app.get("/api", tags=["Endpoints"])
+@app.get(
+    "/api",
+    name="api",
+    tags=["Endpoints"],
+    summary="Returns the results of a google search in json.",
+)
 @limiter.limit("3/minute")
 async def search(
     request: Request,
@@ -71,12 +86,12 @@ async def search(
     Parameters
     ----------
     query : str, optional
-        Query to search the web.
+        *Query to search the web.*
 
     Returns
     -------
     json
-        Response from the google search.
+        *Response from the google search.*
     """
     url = "https://www.googleapis.com/customsearch/v1"
     params = {
@@ -100,12 +115,21 @@ async def search(
         }
 
 
-@app.get("/verify", tags=["Endpoints"])
+@app.get(
+    "/verify",
+    name="verify",
+    tags=["Endpoints"],
+    summary="Detects and flags hallucinations in an LLM's response.",
+)
 @limiter.limit("3/minute")
 async def verify(
     request: Request,
-    llm_query: str = Query(None, description="Enter LLM input"),
-    llm_response: str = Query(None, description="Enter LLM output"),
+    llm_query: str = Query(
+        None, title="LLM query", description="Enter LLM input"
+    ),
+    llm_response: str = Query(
+        None, title="LLM response", description="Enter LLM output"
+    ),
 ) -> dict:
     """Detect and mitigate hallucination.
 
@@ -114,14 +138,15 @@ async def verify(
     Parameters
     ----------
     llm_query : str, optional
-        Query from user.
+        *Query from user.*
+
     llm_response : str, optional
-        Response from LLM.
+        *Response from LLM.*
 
     Returns
     -------
     json
-        Verified results from the web.
+        *Verified results from the web.*
     """
     query = generate_query(llm_query)
     url = "https://www.googleapis.com/customsearch/v1"
@@ -171,7 +196,13 @@ async def verify(
         }
 
 
-@app.get("/search", tags=["Endpoints"])
+@app.get(
+    "/search",
+    name="search",
+    tags=["Endpoints"],
+    summary="Perform a search using the Jina Search API.",
+    description="Returns search results in markdown so LLms can parse and understand easily.",
+)
 @limiter.limit("3/minute")
 async def jina_search(
     request: Request,
