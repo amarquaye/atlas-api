@@ -50,7 +50,7 @@ def generate_query(query: str) -> str:
     return response.text
 
 
-def cmp(llm_response: str, search_result: str, source: str) -> str:
+def cmp(llm_response: str, search_result: str, source: str):
     model = genai.GenerativeModel(
         model_name="gemini-1.5-flash",
         generation_config=generation_config,
@@ -88,7 +88,8 @@ def cmp(llm_response: str, search_result: str, source: str) -> str:
     )
     chat_session = model.start_chat(history=[])
     response = chat_session.send_message(
-        f"The **llm_response** is {llm_response},the **search_result** is {search_result}, and the **source** is {source}"
+        f"The **llm_response** is {llm_response},the **search_result** is {search_result}, and the **source** is {source}",
+        stream=True,
     )
-
-    return response.text
+    for chunk in response:
+        yield chunk.text

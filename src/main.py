@@ -3,12 +3,9 @@ import aiohttp
 from decouple import config
 
 from fastapi import FastAPI, Query, Request
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-
-import json
 
 import primp
 
@@ -23,8 +20,7 @@ app = FastAPI(
     title="Atlas API",
     summary="Hallucination-detecting API.",
     description="🌐Search the web for queries and compare results with LLM to detect and mitigate hallucinations.",
-    version="1.0.4",
-    terms_of_service="https://github.com/atlas-api",
+    version="1.0.5",
     contact={
         "name": "Jesse Amarquaye",
         "url": "https://atlasproject-phi.vercel.app",
@@ -36,15 +32,6 @@ app = FastAPI(
     },
 )
 
-origins = ["*"]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["GET"],
-    allow_headers=["*"],
-)
 
 app.mount("/static", StaticFiles(directory="src/static"), name="static")
 
@@ -77,21 +64,22 @@ def test(request: Request) -> HTMLResponse:
 @limiter.limit("3/minute")
 async def search(
     request: Request,
-    query: str = Query(None, description="Query to search the web"),
+    query: str = Query(description="Query to search the web"),
 ) -> dict:
-    """Search the web.
+    """
+    **Search the web**.
 
-    Returns the results from a google search in json.
+    Returns the results from a _google search_ in json.
 
     Parameters
     ----------
-    query : str, optional
-        *Query to search the web.*
+    query : str,
+        _Query to search the web._
 
     Returns
     -------
     json
-        *Response from the google search.*
+        _Response from the google search._
     """
     url = "https://www.googleapis.com/customsearch/v1"
     params = {
@@ -100,11 +88,17 @@ async def search(
         "cx": config("GOOGLE_SEARCH_ENGINE_ID"),
     }
 
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url=url, params=params) as response:
-            response = await response.json()
-            response = response["items"]
-
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url=url, params=params) as response:
+                response = await response.json()
+                response = response["items"]
+    except KeyError:
+        return {
+            "response": "Oops, something went wrong... Please try again later!",
+            "source": "Your search query couldn't yield any relevant results from the web.",
+        }
+    else:
         return {
             idx: {
                 "title": item.get("title"),
@@ -124,29 +118,30 @@ async def search(
 @limiter.limit("3/minute")
 async def verify(
     request: Request,
-    llm_query: str = Query(
-        None, title="LLM query", description="Enter LLM input"
-    ),
+    llm_query: str = Query(title="LLM query", description="Enter LLM input"),
     llm_response: str = Query(
-        None, title="LLM response", description="Enter LLM output"
+        title="LLM response", description="Enter LLM output"
     ),
 ) -> dict:
-    """Detect and mitigate hallucination.
+    """
+    **Detect and mitigate hallucinations**.
 
-    Scans through a query, compares result from LLM with search results from google to detect and mitigate hallucinations.
+    _Scans_ through a query, _compares_ result from LLM with search results from google to detect and mitigate hallucinations.
+
+    Takes **two** parameters; the **first** one being the query given to the LLM and the **second** one being the response from the LLM.
 
     Parameters
     ----------
-    llm_query : str, optional
-        *Query from user.*
+    llm_query : str,
+        _Query from user._
 
-    llm_response : str, optional
-        *Response from LLM.*
+    llm_response : str,
+        _Response from LLM._
 
     Returns
     -------
     json
-        *Verified results from the web.*
+        _Verified results from the web._
     """
     query = generate_query(llm_query)
     url = "https://www.googleapis.com/customsearch/v1"
@@ -161,39 +156,37 @@ async def verify(
             async with session.get(url=url, params=params) as response:
                 response = await response.json()
                 response = response["items"]
-
-        if str(response[0]["link"]).startswith("https://www.quora.com"):
-            resp = primp.get(
-                url="https://r.jina.ai/" + str(response[0]["link"]),
-                impersonate="chrome_127",
-            )
-        elif str(response[0]["link"]).startswith("https://www.findlaw.com"):
-            resp = primp.get(
-                url="https://r.jina.ai/" + str(response[0]["link"]),
-                impersonate="chrome_127",
-            )
-        elif str(response[0]["link"]).startswith("https://www.youtube.com"):
-            resp = primp.get(
-                url=response[1]["link"],
-                impersonate="chrome_127",
-            )
-        else:
-            resp = primp.get(response[0]["link"], impersonate="chrome_127")
-
-        res = cmp(
-            llm_response=llm_response,
-            search_result=resp.text_markdown,
-            source=str(response[0]["link"]),
-        )
-        res = res.strip("'")
-        res = json.loads(res)
-        return res
-
-    except Exception as e:
+    except KeyError:
         return {
-            "response": "Oops... Something went wrong. Please try again later!",
-            "source": str(e),
+            "response": "Oops, something went wrong... Please try again later!",
+            "source": "Your search query couldn't generate any results.",
         }
+
+    if str(response[0]["link"]).startswith("https://www.quora.com"):
+        resp = primp.get(
+            url="https://r.jina.ai/" + str(response[0]["link"]),
+            impersonate="chrome_127",
+        )
+    elif str(response[0]["link"]).startswith("https://www.findlaw.com"):
+        resp = primp.get(
+            url="https://r.jina.ai/" + str(response[0]["link"]),
+            impersonate="chrome_127",
+        )
+    elif str(response[0]["link"]).startswith("https://www.youtube.com"):
+        resp = primp.get(
+            url=response[1]["link"],
+            impersonate="chrome_127",
+        )
+    else:
+        resp = primp.get(response[0]["link"], impersonate="chrome_127")
+
+    res = cmp(
+        llm_response=llm_response,
+        search_result=resp.text_markdown,
+        source=str(response[0]["link"]),
+    )
+
+    return StreamingResponse(content=res, media_type="application/json")
 
 
 @app.get(
@@ -201,26 +194,30 @@ async def verify(
     name="search",
     tags=["Endpoints"],
     summary="Perform a search using the Jina Search API.",
-    description="Returns search results in markdown so LLms can parse and understand easily.",
 )
 @limiter.limit("3/minute")
 async def jina_search(
     request: Request,
-    query: str = Query(None, description="Query to search the web"),
+    query: str = Query(description="Query to search the web"),
 ) -> dict:
-    """Search the web.
+    """
+    **Search the web**.
 
-    Crawls the web for queries and returns the results of he search in json.
+    _Crawls_ the web for queries and returns the results in json.
+
+    Enter a search query and it will respond with a json object containing your search results rendered in markdown for LLMs to parse or understand easily.
+
+    This endpoint can also be useful when _training_ LLMs.
 
     Parameters
     ----------
-    query : str, optional
-        Query to search the web.
+    query : str
+        _Query to search the web._
 
     Returns
     -------
     json
-        Response from the search.
+        _Response from the search._
     """
     try:
         async with aiohttp.ClientSession() as session:
