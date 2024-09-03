@@ -3,6 +3,7 @@ import aiohttp
 from decouple import config
 
 from fastapi import FastAPI, Query, Request
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -32,6 +33,7 @@ app = FastAPI(
     },
 )
 
+app.add_middleware(GZipMiddleware, minimum_size=1000, compresslevel=5)
 
 app.mount("/static", StaticFiles(directory="src/static"), name="static")
 
@@ -180,13 +182,14 @@ async def verify(
     else:
         resp = primp.get(response[0]["link"], impersonate="chrome_127")
 
-    res = cmp(
-        llm_response=llm_response,
-        search_result=resp.text_markdown,
-        source=str(response[0]["link"]),
+    return StreamingResponse(
+        content=cmp(
+            llm_response=llm_response,
+            search_result=resp.text_markdown,
+            source=str(response[0]["link"]),
+        ),
+        media_type="application/json",
     )
-
-    return StreamingResponse(content=res, media_type="application/json")
 
 
 @app.get(
