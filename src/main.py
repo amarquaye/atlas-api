@@ -202,13 +202,13 @@ async def verify(
 async def jina_search(
     request: Request,
     query: str = Query(description="Query to search the web"),
-) -> dict:
+) -> str:
     """
     **Search the web**.
 
-    _Crawls_ the web for queries and returns the results in json.
+    _Crawls_ the web for queries and returns the results in markdown.
 
-    Enter a search query and it will respond with a json object containing your search results rendered in markdown for LLMs to parse or understand easily.
+    Enter a search query and it will respond in markdown containing your search results for LLMs to parse or understand easily.
 
     This endpoint can also be useful when _training_ LLMs.
 
@@ -219,20 +219,22 @@ async def jina_search(
 
     Returns
     -------
-    json
+    str
         _Response from the search._
     """
-    try:
+
+    async def stream():
         async with aiohttp.ClientSession() as session:
             async with session.get(
                 url="https://s.jina.ai/" + query
             ) as response:
-                response = await response.text()
-                return {"response": response}
+                async for chunk in response.content.iter_chunked(100):
+                    yield chunk
+
+    try:
+        return StreamingResponse(content=stream(), media_type="text/plain")
     except Exception:
-        return {
-            "response": "Oops... Something went wrong. Please try agin later!"
-        }
+        return "Oops... Something went wrong. Please try agin later!"
 
 
 if __name__ == "__main__":
