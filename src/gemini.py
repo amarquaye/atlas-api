@@ -79,11 +79,12 @@ def cmp(llm_response: str, search_result: str, source: str):
         13. Use the json template for all of your responses.
         14. Replace the value of the response key with **Hallucination detected** when there is hallucination is the **llm_response**.
         15. And the value of the response key should be **No hallucination detected** when there is no hallucination or both **llm_response** and **search_result** are similar or communicate the same meaning.
-        16. The value for the key **llm_response** should be replaced with the parts of the **llm_response** that are hallucinations.
-        17. The value for the key **search_result** should be replaced with the parts of the **search_result** that triggered the hallucination detection if any occurred.
-        18. Finally, the value for the key **source** should be replaced with the source({source} as a string).
-        19. Do not flag any **llm_response** content that is not a hallucination as Hallucination Detected.
-        20. Remember to use the template i have provided and only return a json response since your response will be consumed via an API.
+        16. However, if the contents of **search_result** is out of context or does not contain relevant information then the value of the response key should be "Couldn't find any relevant information".
+        17. The value for the key **llm_response** should be replaced with the parts of the **llm_response** that are hallucinations.
+        18. The value for the key **search_result** should be replaced with the parts of the **search_result** that triggered the hallucination detection if any occurred.
+        19. Finally, the value for the key **source** should be replaced with the source({source} as a string).
+        20. Do not flag any **llm_response** content that is not a hallucination as Hallucination Detected.
+        21. Remember to use the template i have provided and only return a json response since your response will be consumed via an API.
         """,
     )
     chat_session = model.start_chat(history=[])
