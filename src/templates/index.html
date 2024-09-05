@@ -26,22 +26,27 @@
       rel="stylesheet"
       href="{{ url_for('static', path='/css/main.css') }}"
     />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', path='/css/font-awesome/css/fontawesome.css') }}"
+    />
 
     <!-- script
     ================================================== -->
     <script src="{{ url_for('static', path='/js/modernizr.js') }}"></script>
     <script src="{{ url_for('static', path='/js/pace.min.js') }}"></script>
+    <script src="https://kit.fontawesome.com/25354b31ab.js" crossorigin="anonymous"></script>
 
     <!-- favicons
     ================================================== -->
     <link
       rel="shortcut icon"
-      href="{{ url_for('static', path='/favicon.ico') }}"
+      href="{{ url_for('static', path='/images/favicon.ico') }}"
       type="image/x-icon"
     />
     <link
       rel="icon"
-      href="{{ url_for('static', path='/favicon.ico') }}"
+      href="{{ url_for('static', path='/images/favicon.ico') }}"
       type="image/x-icon"
     />
   </head>
@@ -58,7 +63,7 @@
         <div class="home-logo">
           <a href="#">
             <img
-              src="{{ url_for('static', path='/images/atlasproject-logo.png') }}"
+              src="{{ url_for('static', path='/images/atlas-logo.png') }}"
               alt="Homepage"
             />
           </a>
@@ -88,7 +93,8 @@
           <!-- end home-content__text -->
 
           <div class="col-four home-content__counter">
-            <h3>Launching soon</h3>
+            <img src="{{ url_for('static', path='/images/atlasproject.gif') }}" alt="atlasproject image" width="500" height="500">
+            <!-- <h3>Launching soon</h3>
 
             <div class="home-content__clock">
               <div class="top">
@@ -109,7 +115,7 @@
                 30
                 <span>S</span>
               </div>
-            </div>
+            </div> -->
             <!-- end home-content__clock -->
           </div>
           <!-- end home-content__counter -->
@@ -122,6 +128,19 @@
               <i class="fab fa-github" aria-hidden="true"></i>
               <span>Github</span>
             </a>
+          </li>
+          <li>
+            <a href="https://atlasproject-phi.vercel.app/docs">
+              <i class="fa-solid fa-book-open-reader" aria-hidden="true"></i>
+              <span>Documentation</span>
+            </a>
+          </li>
+          <li>
+            <a href="https://github.com/amarquaye/atlas-api">
+              <i class="fa-solid fa-code" aria-hidden="true"></i>
+              <span>Code</span>
+            </a>
+          </li>
         </ul>
         <!-- end home-social -->
 
