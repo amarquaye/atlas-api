@@ -11,6 +11,27 @@
     />
     <link rel="stylesheet" href="{{ url_for('static', path='/css/try_style.css') }}">
     <script src="https://unpkg.com/htmx.org@2.0.2" integrity="sha384-Y7hw+L/jvKeWIRRkqWYfPcvVxHzVzn5REgzbawhxAuQGwX1XWe70vji+VSeHOThJ" crossorigin="anonymous"></script>
+    <style>
+        .htmx-indicator {
+            position: relative;
+            margin: 20px auto;
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(128, 128, 128, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--text-color);
+            animation: fastspin 0.35s linear infinite;
+            display: none;
+        }
+    
+        @keyframes fastspin {
+            to { transform: rotate(360deg); }
+        }
+    
+        .htmx-request.htmx-indicator {
+            display: block;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -24,19 +45,50 @@
             <div class="input-field glass">
                 <label for="llm_response">LLM Response:</label>
                 <textarea id="llm_response" name="llm_response" spellcheck="true" required autocomplete="on" placeholder="Enter the LLM response"></textarea>
-            </div>
-            <button id="submit-btn" hx-get="/verify" hx-trigger="click" hx-include="#filter-form" hx-target="#response-container" hx-swap="innerHTML">Verify</button>
-        </form>
-        
+                    </div>
+                    <button id="submit-btn" 
+                        hx-get="/verify" 
+                        hx-trigger="click" 
+                        hx-include="#filter-form" 
+                        hx-target="#response-container" 
+                        hx-swap="innerHTML"
+                        hx-indicator=".htmx-indicator"
+                        hx-on::after-request="formatResponse()">
+                        Verify
+                    </button>
+
+                </form>
+                <div class="htmx-indicator"></div>
         <div class="result-container">
             <div class="result-box glass">
                 <div id="response-container">
+                </div>
+            </div>
+            <div class="result-box glass">
+                <div id="formatted-response-container">
                 </div>
             </div>
         </div>
     </div>
     <script src="{{ url_for('static', path='/js/try_script.js') }}"></script>
 </body>
-</html>></script>
-</body>
 </html>
+
+<script>
+    function formatResponse() {
+        const responseContainer = document.getElementById('response-container');
+        const formattedContainer = document.getElementById('formatted-response-container');
+        
+        try {
+            const jsonData = JSON.parse(responseContainer.textContent);
+            let formattedHtml = '<h3>Formatted Response:</h3><ul>';
+            for (const [key, value] of Object.entries(jsonData)) {
+                formattedHtml += `<li><strong>${key}:</strong> ${value}</li>`;
+            }
+            formattedHtml += '</ul>';
+            formattedContainer.innerHTML = formattedHtml;
+        } catch (error) {
+            formattedContainer.innerHTML = '<p>Error formatting response</p>';
+        }
+    }
+</script>
