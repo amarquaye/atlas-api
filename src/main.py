@@ -21,7 +21,7 @@ app = FastAPI(
     title="Atlas API",
     summary="Hallucination-detecting API.",
     description="🌐Search the web for queries and compare results with LLM to detect and mitigate hallucinations.",
-    version="1.0.5",
+    version="1.0.6",
     contact={
         "name": "Jesse Amarquaye",
         "url": "https://atlasproject-phi.vercel.app",
@@ -197,6 +197,7 @@ async def verify(
     name="search",
     tags=["Endpoints"],
     summary="Perform a search using the Jina Search API.",
+    deprecated=True,
 )
 @limiter.limit("3/minute")
 async def jina_search(
@@ -211,6 +212,9 @@ async def jina_search(
     Enter a search query and it will respond in markdown containing your search results for LLMs to parse or understand easily.
 
     This endpoint can also be useful when _training_ LLMs.
+
+    However this endpoint has been deprecated as its latency is greater than 10s on average and raises a 504 FUNCTION_INVOCATION_TIMEOUT on vercel.
+    But it works when self-hosted.
 
     Parameters
     ----------
