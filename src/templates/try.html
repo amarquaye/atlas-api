@@ -4,13 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Try ATLAS</title>
+    <link
+      rel="icon"
+      href="{{ url_for('static', path='/images/favicon.ico') }}"
+      type="image/x-icon"
+    />
     <link rel="stylesheet" href="{{ url_for('static', path='/css/try_style.css') }}">
     <script src="https://unpkg.com/htmx.org@2.0.2" integrity="sha384-Y7hw+L/jvKeWIRRkqWYfPcvVxHzVzn5REgzbawhxAuQGwX1XWe70vji+VSeHOThJ" crossorigin="anonymous"></script>
 </head>
 <body>
     <div class="container">
         <h1>Verify LLM Response</h1>
-        <button id="mode-toggle" class="mode-toggle">Light Mode</button>
+        <button id="mode-toggle" class="mode-toggle">Light Mode</i></button>
         <form action="/verify" class="input-container" id="filter-form", method="get">
             <div class="input-field glass">
                 <label for="llm_query">LLM Query:</label>
@@ -20,21 +25,18 @@
                 <label for="llm_response">LLM Response:</label>
                 <textarea id="llm_response" name="llm_response" spellcheck="true" required autocomplete="on" placeholder="Enter the LLM response"></textarea>
             </div>
-            <br>
             <button id="submit-btn" hx-get="/verify" hx-trigger="click" hx-include="#filter-form" hx-target="#response-container" hx-swap="innerHTML">Verify</button>
         </form>
         
         <div class="result-container">
             <div class="result-box glass">
                 <div id="response-container">
-                    <h3>Response:</h3>
-                    <p id="response-text"></p>
                 </div>
-                
-                <button id="copy-btn">Copy</button>
             </div>
         </div>
     </div>
     <script src="{{ url_for('static', path='/js/try_script.js') }}"></script>
+</body>
+</html>></script>
 </body>
 </html>
